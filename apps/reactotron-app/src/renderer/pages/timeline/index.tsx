@@ -1,18 +1,18 @@
-import React, { useCallback, useContext, useMemo } from "react"
+import React, { useCallback, useContext, useMemo, useState } from "react"
 import { clipboard } from "electron"
 import fs from "fs"
 import debounce from "lodash.debounce"
 import {
   Header,
   filterCommands,
-  TimelineFilterModal,
   timelineCommandResolver,
   EmptyState,
   ReactotronContext,
   TimelineContext,
 } from "reactotron-core-ui"
-import { MdSearch, MdDeleteSweep, MdFilterList, MdSwapVert, MdReorder } from "react-icons/md"
+import { MdSearch, MdDeleteSweep, MdSwapVert, MdReorder } from "react-icons/md"
 import { FaTimes } from "react-icons/fa"
+import { ALL_COMMANDS, GROUPS } from "./const"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -52,25 +52,45 @@ export const ButtonContainer = styled.div`
   padding: 10px;
   cursor: pointer;
 `
+const FilterContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  width: 100%;
+  background-color: ${(props) => props.theme.background};
+  border-bottom: 1px solid ${(props) => props.theme.chromeLine};
+`
+const FilterButton = styled.button<{ active: boolean }>`
+  background-color: transparent;
+  border: none;
+  padding: 10px;
+  padding-bottom: 12px;
+  cursor: pointer;
+  color: ${(props) => {
+    return props.active ? props.theme.foreground : props.theme.foregroundDark
+  }};
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+  border-bottom: 2px solid;
+  border-color: ${(props) => {
+    return props.active ? props.theme.foreground : "transparent"
+  }};
+  font-size: 14px;
+  white-space: nowrap;
+`
 
 function Timeline() {
   const { sendCommand, clearCommands, commands, openDispatchModal } = useContext(ReactotronContext)
-  const {
-    isSearchOpen,
-    toggleSearch,
-    closeSearch,
-    setSearch,
-    search,
-    isReversed,
-    toggleReverse,
-    openFilter,
-    closeFilter,
-    isFilterOpen,
-    hiddenCommands,
-    setHiddenCommands,
-  } = useContext(TimelineContext)
+  const { isSearchOpen, toggleSearch, closeSearch, setSearch, search, isReversed, toggleReverse } =
+    useContext(TimelineContext)
+  const [currentTab, setCurrentTab] = useState("all")
 
-  let filteredCommands = filterCommands(commands, search, hiddenCommands)
+  let filteredCommands = filterCommands(
+    commands,
+    search,
+    currentTab === "all" ? [] : (ALL_COMMANDS.filter((item) => item !== currentTab) as any)
+  )
 
   if (isReversed) {
     filteredCommands = filteredCommands.reverse()
@@ -93,13 +113,6 @@ function Timeline() {
             icon: MdSearch,
             onClick: () => {
               toggleSearch()
-            },
-          },
-          {
-            tip: "Filter",
-            icon: MdFilterList,
-            onClick: () => {
-              openFilter()
             },
           },
           {
@@ -136,6 +149,20 @@ function Timeline() {
           </SearchContainer>
         )}
       </Header>
+      <FilterContainer>
+        {GROUPS.map((group) => {
+          return group.items.map((item) => {
+            const onToggle = () => {
+              setCurrentTab(item.value)
+            }
+            return (
+              <FilterButton active={currentTab === item.value} key={item.value} onClick={onToggle}>
+                {item.text}
+              </FilterButton>
+            )
+          })
+        })}
+      </FilterContainer>
       <TimelineContainer>
         {filteredCommands.length === 0 ? (
           <EmptyState icon={MdReorder} title="No Activity">
@@ -170,14 +197,6 @@ function Timeline() {
           })
         )}
       </TimelineContainer>
-      <TimelineFilterModal
-        isOpen={isFilterOpen}
-        onClose={() => {
-          closeFilter()
-        }}
-        hiddenCommands={hiddenCommands}
-        setHiddenCommands={setHiddenCommands}
-      />
     </Container>
   )
 }
