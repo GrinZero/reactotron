@@ -1,0 +1,7 @@
+.border-color-inherit {
+  border-color: inherit;
+}
+
+.search-input:focus-visible {
+  outline: none;
+}

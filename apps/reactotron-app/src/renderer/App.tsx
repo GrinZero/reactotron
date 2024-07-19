@@ -9,12 +9,15 @@ import RootModals from "./RootModals"
 
 import Home from "./pages/home"
 import Timeline from "./pages/timeline"
-import Subscriptions from "./pages/state/Subscriptions"
-import Snapshots from "./pages/state/Snapshots"
 import Overlay from "./pages/reactNative/Overlay"
 import Storybook from "./pages/reactNative/Storybook"
 import CustomCommands from "./pages/customCommands"
 import Help from "./pages/help"
+import StateIndex from "./pages/state"
+import Snapshots from "./pages/state/Snapshots"
+import Subscriptions from "./pages/state/Subscriptions"
+import Store from "./pages/state/Store"
+import "./tailwind.css"
 
 const AppContainer = styled.div`
   position: absolute;
@@ -58,8 +61,11 @@ function App() {
                 <Route path="/timeline" element={<Timeline />} />
 
                 {/* State */}
-                <Route path="/state/subscriptions" element={<Subscriptions />} />
-                <Route path="/state/snapshots" element={<Snapshots />} />
+                <Route path="/state" element={<StateIndex />}>
+                  <Route path="/state/snapshots" index element={<Snapshots />} />
+                  <Route path="/state/subscriptions" element={<Subscriptions />} />
+                  <Route path="/state/store" element={<Store />} />
+                </Route>
 
                 {/* React Native */}
                 <Route path="/native/overlay" element={<Overlay />} />

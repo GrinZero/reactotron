@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo, useState } from "react"
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { clipboard } from "electron"
 import fs from "fs"
 import debounce from "lodash.debounce"
@@ -12,7 +12,7 @@ import {
 } from "reactotron-core-ui"
 import { MdSearch, MdDeleteSweep, MdSwapVert, MdReorder } from "react-icons/md"
 import { FaTimes } from "react-icons/fa"
-import { ALL_COMMANDS, GROUPS } from "./const"
+import { GROUPS } from "./const"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -56,7 +56,7 @@ const FilterContainer = styled.div`
   display: flex;
   flex-direction: row;
   overflow-x: auto;
-  width: 100%;
+  width: calc(100vw - 115px);
   background-color: ${(props) => props.theme.background};
   border-bottom: 1px solid ${(props) => props.theme.chromeLine};
 `
@@ -81,15 +81,49 @@ const FilterButton = styled.button<{ active: boolean }>`
 `
 
 function Timeline() {
-  const { sendCommand, clearCommands, commands, openDispatchModal } = useContext(ReactotronContext)
+  const ctx = useContext(ReactotronContext)
+  const { commands, sendCommand, clearCommands, openDispatchModal } = ctx
   const { isSearchOpen, toggleSearch, closeSearch, setSearch, search, isReversed, toggleReverse } =
     useContext(TimelineContext)
   const [currentTab, setCurrentTab] = useState("all")
+  const { current: Plugins } = useRef<any>([])
+  const CurrentPlugin = useMemo(() => {
+    return Plugins.find((plugin: any) => plugin.meta.value === currentTab)
+  }, [Plugins, currentTab])
+
+  const [groups, setGroups] = useState(GROUPS)
+  const allValues = useMemo(() => {
+    return groups.reduce((acc, group) => {
+      return acc.concat(group.items.map((item) => item.value))
+    }, [] as string[])
+  }, [groups])
+  const [extraValues, setExtraValues] = useState([])
+
+  useEffect(() => {
+    const handler = (module) => {
+      const createPlugin = module.default
+      const plugin = createPlugin({})
+      Plugins.push(plugin)
+      setGroups((prev) => {
+        return [
+          ...prev,
+          {
+            name: "plugins",
+            items: [{ value: plugin.meta.value, text: plugin.meta.text }],
+          },
+        ]
+      })
+      setExtraValues((prev) => [...prev, plugin.meta.value])
+    }
+    import("../../plugins/timeline-mmkv-plugin").then(handler)
+    import("../../plugins/timeline-jotai-plugin").then(handler)
+  }, [])
+  console.log("commands", commands)
 
   let filteredCommands = filterCommands(
     commands,
     search,
-    currentTab === "all" ? [] : (ALL_COMMANDS.filter((item) => item !== currentTab) as any)
+    currentTab === "all" ? [] : (allValues.filter((item) => item !== currentTab) as any)
   )
 
   if (isReversed) {
@@ -150,7 +184,7 @@ function Timeline() {
         )}
       </Header>
       <FilterContainer>
-        {GROUPS.map((group) => {
+        {groups.map((group) => {
           return group.items.map((item) => {
             const onToggle = () => {
               setCurrentTab(item.value)
@@ -164,38 +198,40 @@ function Timeline() {
         })}
       </FilterContainer>
       <TimelineContainer>
-        {filteredCommands.length === 0 ? (
-          <EmptyState icon={MdReorder} title="No Activity">
-            Once your app connects and starts sending events, they will appear here.
-          </EmptyState>
-        ) : (
-          filteredCommands.map((command) => {
-            const CommandComponent = timelineCommandResolver(command.type)
+        {!extraValues.includes(currentTab) &&
+          (filteredCommands.length === 0 ? (
+            <EmptyState icon={MdReorder} title="No Activity">
+              Once your app connects and starts sending events, they will appear here.
+            </EmptyState>
+          ) : (
+            filteredCommands.map((command) => {
+              const CommandComponent = timelineCommandResolver(command.type)
 
-            if (CommandComponent) {
-              return (
-                <CommandComponent
-                  key={command.messageId}
-                  command={command}
-                  copyToClipboard={clipboard.writeText}
-                  readFile={(path) => {
-                    return new Promise((resolve, reject) => {
-                      fs.readFile(path, "utf-8", (err, data) => {
-                        if (err || !data) reject(new Error("Something failed"))
-                        else resolve(data)
+              if (CommandComponent) {
+                return (
+                  <CommandComponent
+                    key={command.messageId}
+                    command={command}
+                    copyToClipboard={clipboard.writeText}
+                    readFile={(path) => {
+                      return new Promise((resolve, reject) => {
+                        fs.readFile(path, "utf-8", (err, data) => {
+                          if (err || !data) reject(new Error("Something failed"))
+                          else resolve(data)
+                        })
                       })
-                    })
-                  }}
-                  sendCommand={sendCommand}
-                  dispatchAction={dispatchAction}
-                  openDispatchDialog={openDispatchModal}
-                />
-              )
-            }
+                    }}
+                    sendCommand={sendCommand}
+                    dispatchAction={dispatchAction}
+                    openDispatchDialog={openDispatchModal}
+                  />
+                )
+              }
 
-            return null
-          })
-        )}
+              return null
+            })
+          ))}
+        {extraValues.includes(currentTab) && <CurrentPlugin.render {...ctx} />}
       </TimelineContainer>
     </Container>
   )

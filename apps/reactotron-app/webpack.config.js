@@ -10,6 +10,7 @@
 // replace it with `createHash("sha256")`, then run patch-package again.
 
 module.exports = function (config) {
+  config.module.rules[2].use.push("postcss-loader")
   return {
     ...config,
     output: {

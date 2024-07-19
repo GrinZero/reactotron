@@ -1,5 +1,8 @@
 import { CommandType } from "reactotron-core-contract"
-export const GROUPS = [
+export const GROUPS: {
+  name: string
+  items: { value: string; text: string }[]
+}[] = [
   {
     name: "All",
     items: [{ value: "all" as const, text: "All" }],
@@ -34,9 +37,6 @@ export const GROUPS = [
   },
 ]
 
-export const ALL_COMMANDS = GROUPS.reduce(
-  (acc, group) => {
-    return acc.concat(group.items.map((item) => item.value))
-  },
-  [] as (typeof CommandType)[]
-) as unknown as string[]
+export const ALL_COMMANDS = GROUPS.reduce((acc, group) => {
+  return acc.concat(group.items.map((item) => item.value))
+}, [] as string[])

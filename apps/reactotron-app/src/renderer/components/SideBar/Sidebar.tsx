@@ -25,6 +25,7 @@ const SideBarContainer = styled.div.attrs(() => ({}))<SideBarContainerProps>`
   background-color: ${(props) => props.theme.backgroundSubtleDark};
   border-right: 1px solid ${(props) => props.theme.chromeLine};
   width: 115px;
+  flex-shrink: 0;
   transition: margin 0.2s ease-out;
   margin-left: ${(props) => (props.$isOpen ? 0 : -115)}px;
 `
@@ -60,7 +61,7 @@ function SideBar({ isOpen, serverStatus }: { isOpen: boolean; serverStatus: Serv
       <SideBarButton icon={MdReorder} path="/timeline" text="Timeline" />
       <SideBarButton
         icon={MdAssignment}
-        path="/state/subscriptions"
+        path="/state/snapshots"
         matchPath="/state"
         text="State"
       />

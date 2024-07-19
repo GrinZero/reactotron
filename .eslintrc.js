@@ -22,11 +22,6 @@ module.exports = {
     "import/parsers": {
       "@typescript-eslint/parser": [".ts", ".tsx"],
     },
-    "import/resolver": {
-      node: {
-        extensions: [".js", ".jsx", ".ts", ".tsx"],
-      },
-    },
     "import/ignore": [
       "node_modules/react-native/index\\.js$",
       "react-native/Libraries/LogBox/Data/parseLogBoxLog.js",
@@ -48,6 +43,7 @@ module.exports = {
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/member-delimiter-style": 0,
     "import/no-cycle": "error",
+    "import/no-unresolved": [2, { ignore: ["^@/", "^./", "^../"] }],
   },
   ignorePatterns: [
     "**/dist/**/*",
