@@ -11,6 +11,7 @@ export enum ActionTypes {
   ChangeSelectedClientId = "CHANGE_SELECTED_CLIENT_ID",
   AddCommandHandler = "ADD_COMMAND_HANDLER",
   PortUnavailable = "PORT_UNAVAILABLE",
+  RemoveCommand = "REMOVE_COMMAND",
 }
 
 export type ServerStatus = "stopped" | "portUnavailable" | "started"
@@ -54,6 +55,7 @@ type Action =
   | { type: ActionTypes.ClearConnectionCommands }
   | { type: ActionTypes.AddCommandHandler; payload: (command: any) => void }
   | { type: ActionTypes.PortUnavailable; payload: undefined }
+  | { type: ActionTypes.RemoveCommand; payload: number }
 
 export function reducer(state: State, action: Action) {
   switch (action.type) {
@@ -172,6 +174,12 @@ export function reducer(state: State, action: Action) {
         console.error("Port unavailable!")
         draftState.serverStatus = "portUnavailable"
       })
+    case ActionTypes.RemoveCommand:
+      return produce(state, (draftState) => {
+        draftState.connections.forEach((c) => {
+          c.commands = c.commands.filter((cmd) => cmd.id !== action.payload)
+        })
+      })
     default:
       return state
   }
@@ -230,6 +238,10 @@ function useStandalone() {
     dispatch({ type: ActionTypes.PortUnavailable, payload: undefined })
   }, [])
 
+  const removeCommand = useCallback((id: number) => {
+    dispatch({ type: ActionTypes.RemoveCommand, payload: id })
+  }, [])
+
   return {
     ...state,
     selectedConnection: state.connections.find((c) => c.clientId === state.selectedClientId),
@@ -242,6 +254,7 @@ function useStandalone() {
     clearSelectedConnectionCommands,
     addCommandListener,
     portUnavailable,
+    removeCommand,
   }
 }
 

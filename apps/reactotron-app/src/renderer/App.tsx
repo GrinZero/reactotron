@@ -18,6 +18,7 @@ import Snapshots from "./pages/state/Snapshots"
 import Subscriptions from "./pages/state/Subscriptions"
 import Store from "./pages/state/Store"
 import "./tailwind.css"
+import Storage from "./pages/state/Storage"
 
 const AppContainer = styled.div`
   position: absolute;
@@ -65,6 +66,7 @@ function App() {
                   <Route path="/state/snapshots" index element={<Snapshots />} />
                   <Route path="/state/subscriptions" element={<Subscriptions />} />
                   <Route path="/state/store" element={<Store />} />
+                  <Route path="/state/storage" element={<Storage />} />
                 </Route>
 
                 {/* React Native */}

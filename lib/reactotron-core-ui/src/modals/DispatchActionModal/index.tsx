@@ -8,6 +8,8 @@ const KEY_MAPS = {
   ctrl: "CTRL",
 }
 
+// eslint-disable-next-line no-eval
+const eval2 = eval
 const InstructionText = styled.div`
   text-align: left;
   color: ${(props) => props.theme.foreground};
@@ -69,7 +71,7 @@ const DispatchActionModal: FunctionComponent<Props> = ({
   const handleKeypress = (e) => {
     if (e.keyCode === 13 && e.metaKey) {
       // We need to take a string that is not exactly JSON and make it an object.
-      const actualAction = eval(`(${action})`) // eslint-disable-line
+      const actualAction = eval2(`(${action})`)
 
       onDispatchAction(actualAction)
       setAction("")

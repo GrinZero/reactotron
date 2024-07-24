@@ -38,6 +38,7 @@ const Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     connectionDisconnected,
     addCommandListener,
     portUnavailable,
+    removeCommand,
   } = useStandalone()
 
   useEffect(() => {
@@ -88,6 +89,7 @@ const Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       <ReactotronBrain
         commands={(selectedConnection || { commands: [] }).commands}
         sendCommand={sendCommand}
+        removeCommand={removeCommand}
         clearCommands={clearSelectedConnectionCommands}
         addCommandListener={addCommandListener}
       >
