@@ -74,7 +74,7 @@ export const makeTableWithContentView = (obj: unknown) => {
           <RowContainer key={key}>
             <KeyContainer>{key}</KeyContainer>
             <ValueContainer $value={value}>
-              <ContentView value={value} />
+              <ContentView value={value} treeLevel={2} />
             </ValueContainer>
           </RowContainer>
         )

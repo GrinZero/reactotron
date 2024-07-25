@@ -7,6 +7,7 @@ import {
   MdWarning,
   MdOutlineMobileFriendly,
   MdMobiledataOff,
+  MdNetworkCheck,
 } from "react-icons/md"
 import { FaMagic } from "react-icons/fa"
 import styled from "styled-components"
@@ -59,12 +60,9 @@ function SideBar({ isOpen, serverStatus }: { isOpen: boolean; serverStatus: Serv
     <SideBarContainer $isOpen={isOpen}>
       <SideBarButton image={reactotronLogo} path="/" text="Home" hideTopBar />
       <SideBarButton icon={MdReorder} path="/timeline" text="Timeline" />
-      <SideBarButton
-        icon={MdAssignment}
-        path="/state/snapshots"
-        matchPath="/state"
-        text="State"
-      />
+      {/* Network */}
+      <SideBarButton path="/network" icon={MdNetworkCheck} text="Network" />
+      <SideBarButton icon={MdAssignment} path="/state/snapshots" matchPath="/state" text="State" />
       <SideBarButton
         icon={MdPhoneIphone}
         path="/native/overlay"

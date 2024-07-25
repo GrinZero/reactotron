@@ -11,7 +11,7 @@
 
 module.exports = function (config) {
   config.module.rules[2].use.push("postcss-loader")
-  config.externals = config.externals.filter((e) => e !== "react-json-view-18")
+  config.externals = config.externals.filter((e) => !["react-virtuoso", "react-json-view-18", "@mui/material", "@emotion/react", "@emotion/styled"].includes(e))
   return {
     ...config,
     output: {

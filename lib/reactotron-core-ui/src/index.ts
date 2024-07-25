@@ -71,3 +71,4 @@ export type { CustomCommand } from "./contexts/CustomCommands/useCustomCommands"
 export type { Snapshot } from "./contexts/State/useSnapshots"
 
 export * from "./components/HeaderTabButton"
+export * from "./timelineCommands"

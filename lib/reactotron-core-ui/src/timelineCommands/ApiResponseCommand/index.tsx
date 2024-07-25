@@ -50,6 +50,7 @@ interface ApiResponsePayload {
 
 interface Props extends TimelineCommandProps<ApiResponsePayload> {
   initialTab?: Tab
+  className?: string
 }
 
 function createTabBuilder(onTab: Tab, setOnTab: (tab: Tab) => void) {
@@ -124,6 +125,22 @@ function buildToolbar(commandPayload, copyToClipboard: (text: string) => void) {
   return toolbarItems
 }
 
+const StyledDrawer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 24px 16px;
+  background-color: ${(props) => props.theme.backgroundDarker};
+`
+const StyledDrawerH4 = styled.h4`
+  margin-top: 0px;
+  margin-bottom: 8px;
+  color: ${(props) => props.theme.foregroundLight};
+`
+const StyledDrawerHr = styled.hr`
+  width: 100%;
+  color: ${(props) => props.theme.foregroundLight};
+`
+
 const ApiResponseCommand: FunctionComponent<Props> = ({
   command,
   copyToClipboard,
@@ -180,4 +197,62 @@ const ApiResponseCommand: FunctionComponent<Props> = ({
 
 export default buildTimelineCommand(ApiResponseCommand)
 
-export { ApiResponseCommand }
+const ApiResponseDrawerCommand: FunctionComponent<Props> = ({
+  command,
+  className,
+  // copyToClipboard,
+  // initialTab,
+}) => {
+  // const [onTab, setOnTab] = useState<Tab>(initialTab || null)
+
+  const { payload } = command
+  const { duration, request, response } = payload
+
+  const cleanedUrl = request.url.replace(/^http(s):\/\/[^/]+/i, "").replace(/\?.*$/i, "")
+  // const preview = `${(request.method || "").toUpperCase()} ${cleanedUrl}`
+
+  const summary = {
+    "Base URL": request.url,
+    Endpoint: cleanedUrl,
+    "Status Code": response.status,
+    Method: request.method,
+    "Duration (ms)": duration,
+  }
+
+  // const tabBuilder = createTabBuilder(onTab, setOnTab)
+
+  return (
+    <StyledDrawer className={className}>
+      <NameContainer>Request Details</NameContainer>
+      <StyledDrawerHr />
+      <ContentView value={summary} />
+
+      {request.params && (
+        <>
+          <StyledDrawerHr />
+          <StyledDrawerH4>Request Params</StyledDrawerH4>
+          <ContentView value={request.params} />
+        </>
+      )}
+      <StyledDrawerHr />
+      <StyledDrawerH4>Request Header</StyledDrawerH4>
+      <ContentView value={request.headers} />
+      <StyledDrawerHr />
+      <StyledDrawerH4>Response Header</StyledDrawerH4>
+      <ContentView value={response.headers} />
+      {request.data && (
+        <>
+          <StyledDrawerHr />
+          <StyledDrawerH4>Request</StyledDrawerH4>
+          <ContentView value={request.data} treeLevel={1} />
+        </>
+      )}
+      <StyledDrawerHr />
+      <StyledDrawerH4>Response</StyledDrawerH4>
+      <ContentView value={response.body} />
+      <div style={{ height: "64px" }}></div>
+    </StyledDrawer>
+  )
+}
+
+export { ApiResponseCommand, ApiResponseDrawerCommand }
