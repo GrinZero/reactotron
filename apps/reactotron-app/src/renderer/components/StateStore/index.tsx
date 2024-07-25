@@ -91,6 +91,7 @@ export const StateStore: React.FC<StateStoreProps> = ({
                   onChange={(e) => {
                     onStateChange?.(key, e.target.value)
                   }}
+                  className="cleaner"
                 />
               )
             }
@@ -103,6 +104,7 @@ export const StateStore: React.FC<StateStoreProps> = ({
                   onChange={(e) => {
                     onStateChange?.(key, parseInt(e.target.value))
                   }}
+                  className="cleaner"
                 />
               )
             }
@@ -116,6 +118,7 @@ export const StateStore: React.FC<StateStoreProps> = ({
                     onChange={(e) => {
                       onStateChange?.(key, e.target.checked)
                     }}
+                    className="cleaner"
                   />
                   <span>{value ? "true" : "false"}</span>
                 </label>
@@ -137,7 +140,7 @@ export const StateStore: React.FC<StateStoreProps> = ({
             )}
           >
             <div
-              className="w-[18vw] flex-shrink-0 overflow-hidden pl-[8px]"
+              className="w-[18vw] flex-shrink-0 overflow-hidden p-[8px]"
               title={key}
               data-for={`state-store-${key}`}
               data-tip={key}
@@ -145,7 +148,7 @@ export const StateStore: React.FC<StateStoreProps> = ({
               {key}
               <Tooltip id={`state-store-${key}`} multiline />
             </div>
-            <div className="w-3/4 border-l border-solid p-[8px] border-color-inherit flex-shrink-0">
+            <div className="border-l border-solid p-[8px] border-color-inherit flex-shrink-0 flex-1">
               {ele}
             </div>
           </div>
@@ -162,21 +165,22 @@ export const StateStore: React.FC<StateStoreProps> = ({
       }}
     >
       <SearchInput
-        className="search-input"
+        className="cleaner"
         onChange={(e) => {
           debounceSearch(e.target.value)
         }}
+        placeholder="Search"
       />
       <div
-        className="flex flex-row items-start w-full font-bold"
+        className="flex flex-row items-start w-full font-bold border border-solid"
         style={{
           borderColor: theme.line,
         }}
       >
-        <div className="w-[18vw] border border-solid p-[8px] border-color-inherit flex-shrink-0">
+        <div className="w-[18vw] p-[8px] border-color-inherit flex-shrink-0">
           Key
         </div>
-        <div className="w-3/4 border border-l-0 border-solid p-[8px] border-color-inherit flex-shrink-0">
+        <div className="border-l border-solid p-[8px] border-color-inherit flex-shrink-0 flex-1">
           Value
         </div>
       </div>

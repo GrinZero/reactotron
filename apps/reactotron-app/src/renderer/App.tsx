@@ -79,10 +79,10 @@ function App() {
 
                   {/* State */}
                   <Route path="/state" element={<StateIndex />}>
-                    <Route path="/state/snapshots" index element={<Snapshots />} />
-                    <Route path="/state/subscriptions" element={<Subscriptions />} />
-                    <Route path="/state/store" element={<Store />} />
+                    <Route path="/state/store" index element={<Store />} />
                     <Route path="/state/storage" element={<Storage />} />
+                    <Route path="/state/snapshots" element={<Snapshots />} />
+                    <Route path="/state/subscriptions" element={<Subscriptions />} />
                   </Route>
 
                   {/* React Native */}

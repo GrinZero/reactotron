@@ -20,6 +20,7 @@ export type { StateResponsePlugin } from "./plugins/state-responses"
 
 export enum ArgType {
   String = "string",
+  Select = "select",
 }
 
 export interface CustomCommandArg {
@@ -54,6 +55,7 @@ interface DisplayConfig {
 
 interface ArgTypeMap {
   [ArgType.String]: string
+  [ArgType.Select]: unknown
 }
 
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void

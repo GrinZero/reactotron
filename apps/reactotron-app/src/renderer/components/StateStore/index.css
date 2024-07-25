@@ -2,6 +2,6 @@
   border-color: inherit;
 }
 
-.search-input:focus-visible {
+.cleaner:focus-visible {
   outline: none;
 }

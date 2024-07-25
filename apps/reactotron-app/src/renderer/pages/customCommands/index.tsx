@@ -200,7 +200,7 @@ function CustomCommands() {
         {isSearchOpen && (
           <SearchContainer>
             <SearchLabel>Search</SearchLabel>
-            <SearchInput value={search} onChange={(e) => setSearch(e.target.value)} />
+            <SearchInput className="cleaner" value={search} onChange={(e) => setSearch(e.target.value)} />
           </SearchContainer>
         )}
       </Header>

@@ -28,7 +28,6 @@ const LeftContainer = styled.div`
   display: flex;
   flex-direction: row;
   flex: 1;
-  width: 100px;
   align-items: center;
   gap: 8px;
 `

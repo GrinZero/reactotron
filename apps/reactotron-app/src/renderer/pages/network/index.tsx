@@ -255,7 +255,7 @@ function NetworkPage() {
         {isSearchOpen && (
           <SearchContainer>
             <SearchLabel>Search</SearchLabel>
-            <SearchInput autoFocus value={search} onChange={(e) => setSearch(e.target.value)} />
+            <SearchInput className="cleaner" autoFocus value={search} onChange={(e) => setSearch(e.target.value)} />
             <ButtonContainer
               onClick={() => {
                 if (search === "") {

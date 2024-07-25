@@ -13,16 +13,6 @@ export default function StateIndex() {
         isDraggable
         tabs={[
           {
-            text: "Subscriptions",
-            icon: MdNotificationsNone,
-            route: "/state/subscriptions",
-          },
-          {
-            text: "Snapshots",
-            route: "/state/snapshots",
-            icon: MdImportExport,
-          },
-          {
             text: "Store",
             route: "/state/store",
             icon: MdStore,
@@ -31,6 +21,16 @@ export default function StateIndex() {
             text: "Storage",
             route: "/state/storage",
             icon: MdStorage,
+          },
+          {
+            text: "Subscriptions",
+            icon: MdNotificationsNone,
+            route: "/state/subscriptions",
+          },
+          {
+            text: "Snapshots",
+            route: "/state/snapshots",
+            icon: MdImportExport,
           },
         ]}
         actions={actions}

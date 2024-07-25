@@ -62,7 +62,7 @@ function SideBar({ isOpen, serverStatus }: { isOpen: boolean; serverStatus: Serv
       <SideBarButton icon={MdReorder} path="/timeline" text="Timeline" />
       {/* Network */}
       <SideBarButton path="/network" icon={MdNetworkCheck} text="Network" />
-      <SideBarButton icon={MdAssignment} path="/state/snapshots" matchPath="/state" text="State" />
+      <SideBarButton icon={MdAssignment} path="/state/store" matchPath="/state" text="State" />
       <SideBarButton
         icon={MdPhoneIphone}
         path="/native/overlay"
