@@ -93,7 +93,7 @@ function rowContent(
   maxTime: number
 ) {
   const { payload, date } = command
-  const { request, response, duration } = payload
+  const { request, response, duration = 0 } = payload
   const { url, method } = request
   const { status } = response
   const size = response?.["Content-Length"] || JSON.stringify(response.body).length
@@ -155,7 +155,6 @@ function NetworkPage() {
     const cmds = filterCommands(commands, search, hiddenCommands).filter((a) =>
       a.type.startsWith("api.")
     )
-
     return (isReversed ? cmds.reverse() : cmds) as NetworkCommandType[]
   }, [commands, search, hiddenCommands, isReversed])
 
@@ -255,7 +254,12 @@ function NetworkPage() {
         {isSearchOpen && (
           <SearchContainer>
             <SearchLabel>Search</SearchLabel>
-            <SearchInput className="cleaner" autoFocus value={search} onChange={(e) => setSearch(e.target.value)} />
+            <SearchInput
+              className="cleaner"
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
             <ButtonContainer
               onClick={() => {
                 if (search === "") {

@@ -65,7 +65,6 @@ function Storage() {
           readonly={false}
           state={storage}
           onStateChange={(key, value) => {
-            console.log("key", key, "value", value)
             sendCommand("storage.user.change", { key, value })
           }}
         />

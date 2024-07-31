@@ -12,7 +12,7 @@ const SubscriptionsContainer = styled.div`
 `
 
 function Store() {
-  const { commands, removeCommand } = useContext(ReactotronContext)
+  const { commands, removeCommand, sendCommand } = useContext(ReactotronContext)
   const { setActions } = useContext(StateContext)
 
   const latestCommand = useMemo(() => {
@@ -37,7 +37,13 @@ function Store() {
           Once your app connects and starts sending state, it will appear here
         </EmptyState>
       ) : (
-        <StateStore readonly state={(latestCommand.payload as { state: any }).state} />
+        <StateStore
+          readonly={false}
+          state={(latestCommand.payload as { state: any }).state}
+          onStateChange={(key, value) => {
+            sendCommand("store.user.change", { key, value })
+          }}
+        />
       )}
     </SubscriptionsContainer>
   )

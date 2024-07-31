@@ -9,8 +9,9 @@ import {
   EmptyState,
   ReactotronContext,
   TimelineContext,
+  TimelineFilterModal,
 } from "reactotron-core-ui"
-import { MdSearch, MdDeleteSweep, MdSwapVert, MdReorder } from "react-icons/md"
+import { MdSearch, MdDeleteSweep, MdSwapVert, MdReorder, MdFilterList } from "react-icons/md"
 import { FaTimes } from "react-icons/fa"
 import { GROUPS } from "./const"
 import styled from "styled-components"
@@ -83,8 +84,20 @@ const FilterButton = styled.button<{ active: boolean }>`
 function Timeline() {
   const ctx = useContext(ReactotronContext)
   const { commands, sendCommand, clearCommands, openDispatchModal } = ctx
-  const { isSearchOpen, toggleSearch, closeSearch, setSearch, search, isReversed, toggleReverse } =
-    useContext(TimelineContext)
+  const {
+    isSearchOpen,
+    toggleSearch,
+    closeSearch,
+    setSearch,
+    openFilter,
+    search,
+    isReversed,
+    isFilterOpen,
+    closeFilter,
+    toggleReverse,
+    hiddenCommands,
+    setHiddenCommands,
+  } = useContext(TimelineContext)
   const [currentTab, setCurrentTab] = useState("all")
   const { current: Plugins } = useRef<any>([])
   const CurrentPlugin = useMemo(() => {
@@ -150,6 +163,13 @@ function Timeline() {
             },
           },
           {
+            tip: "Filter",
+            icon: MdFilterList,
+            onClick: () => {
+              openFilter()
+            },
+          },
+          {
             tip: "Reverse Order",
             icon: MdSwapVert,
             onClick: () => {
@@ -168,7 +188,12 @@ function Timeline() {
         {isSearchOpen && (
           <SearchContainer>
             <SearchLabel>Search</SearchLabel>
-            <SearchInput className="cleaner" autoFocus value={searchString} onChange={handleInputChange} />
+            <SearchInput
+              className="cleaner"
+              autoFocus
+              value={searchString}
+              onChange={handleInputChange}
+            />
             <ButtonContainer
               onClick={() => {
                 if (search === "") {
@@ -233,6 +258,14 @@ function Timeline() {
           ))}
         {extraValues.includes(currentTab) && <CurrentPlugin.render {...ctx} />}
       </TimelineContainer>
+      <TimelineFilterModal
+        isOpen={isFilterOpen}
+        onClose={() => {
+          closeFilter()
+        }}
+        hiddenCommands={hiddenCommands}
+        setHiddenCommands={setHiddenCommands}
+      />
     </Container>
   )
 }
