@@ -13,6 +13,7 @@ export interface CustomCommand {
   description?: string
   args?: {
     name: string
+    extra?: any
   }[]
 }
 
@@ -40,13 +41,14 @@ function customCommandsReducer(state: CustomCommandState, action: Action) {
       return produce(state, (draftState) => {
         draftState.customCommands.push({
           clientId: action.payload.clientId,
-          ...action.payload.payload,
+          ...(action.payload.payload as any),
         })
       })
     case CustomCommandsActionType.CommandRemove:
       return produce(state, (draftState) => {
         const commandIndex = draftState.customCommands.findIndex(
-          (cc) => cc.clientId === action.payload.clientId && cc.id === action.payload.payload.id
+          (cc) =>
+            cc.clientId === action.payload.clientId && cc.id === (action.payload.payload as any).id
         )
 
         if (commandIndex === -1) return

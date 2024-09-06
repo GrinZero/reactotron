@@ -1,9 +1,8 @@
-import React, { useContext, useState } from "react"
+import React, { useContext, useEffect, useState } from "react"
 import {
   ContentView,
   SnapshotRenameModal,
   StateContext,
-  Header,
   EmptyState,
   Tooltip,
 } from "reactotron-core-ui"
@@ -14,17 +13,10 @@ import {
   MdCreate,
   MdDelete,
   MdFileUpload,
-  MdNotificationsNone,
   MdImportExport,
   MdCallReceived,
   MdFileDownload,
 } from "react-icons/md"
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`
 
 const SnapshotsContainer = styled.div`
   height: 100%;
@@ -143,47 +135,30 @@ function Snapshots() {
     closeSnapshotRenameModal,
     renameingSnapshot,
     renameSnapshot,
+    setActions,
   } = useContext(StateContext)
 
+  useEffect(() => {
+    setActions([
+      {
+        tip: "Copy all snapshots to clipboard",
+        icon: MdCallReceived,
+        onClick: () => {
+          clipboard.writeText(JSON.stringify(snapshots))
+        },
+      },
+      {
+        tip: "Add Snapshot",
+        icon: MdFileDownload,
+        onClick: () => {
+          createSnapshot()
+        },
+      },
+    ])
+  }, [createSnapshot, setActions, snapshots])
+
   return (
-    <Container>
-      <Header
-        isDraggable
-        tabs={[
-          {
-            text: "Subscriptions",
-            icon: MdNotificationsNone,
-            isActive: false,
-            onClick: () => {
-              // TODO: Couldn't get react-router-dom to do it for me so I forced it.
-              window.location.hash = "#/state/subscriptions"
-            },
-          },
-          {
-            text: "Snapshots",
-            icon: MdImportExport,
-            isActive: true,
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            onClick: () => {},
-          },
-        ]}
-        actions={[
-          {
-            tip: "Copy all snapshots to clipboard",
-            icon: MdCallReceived,
-            onClick: () => {
-              clipboard.writeText(JSON.stringify(snapshots))
-            },
-          },
-          {
-            tip: "Add Snapshot",
-            icon: MdFileDownload,
-            onClick: () => {
-              createSnapshot()
-            },
-          },
-        ]}
-      />
+    <>
       <SnapshotsContainer>
         {snapshots.length === 0 ? (
           <EmptyState icon={MdImportExport} title="No Snapshots">
@@ -208,7 +183,7 @@ function Snapshots() {
         onClose={closeSnapshotRenameModal}
         onRenameSnapshot={renameSnapshot}
       />
-    </Container>
+    </>
   )
 }
 

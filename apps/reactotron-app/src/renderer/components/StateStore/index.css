@@ -1,0 +1,7 @@
+.border-color-inherit {
+  border-color: inherit;
+}
+
+.cleaner:focus-visible {
+  outline: none;
+}

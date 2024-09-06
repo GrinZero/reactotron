@@ -6,7 +6,7 @@
  */
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native"
 import { createNativeStackNavigator, NativeStackScreenProps } from "@react-navigation/native-stack"
-import React from "react"
+import React, { useEffect } from "react"
 import { useColorScheme, StyleSheet } from "react-native"
 import * as Screens from "app/screens"
 import Config from "../config"
@@ -115,6 +115,12 @@ export const AppNavigator = function AppNavigator(props: NavigationProps) {
   const colorScheme = useColorScheme()
 
   useBackButtonHandler((routeName) => exitRoutes.includes(routeName))
+
+  useEffect(() => {
+    const theme = colorScheme === "dark" ? "dark" : "light"
+    document.documentElement.setAttribute("data-mui-color-scheme", theme)
+    document.documentElement.setAttribute("data-joy-color-scheme", theme)
+  }, [colorScheme])
 
   return (
     <NavigationContainer

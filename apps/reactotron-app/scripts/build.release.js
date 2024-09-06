@@ -2,7 +2,7 @@
 // #region Validate inputs
 const isCi = process.env.CI === "true"
 let skipSigning = false
-const BUILD_TARGET = process.env.BUILD_TARGET
+const BUILD_TARGET = process.env.BUILD_TARGET || "macos"
 if (BUILD_TARGET !== "macos" && BUILD_TARGET !== "linux" && BUILD_TARGET !== "windows") {
   throw new Error('BUILD_TARGET must be either "macos", "linux" or "windows"')
 }

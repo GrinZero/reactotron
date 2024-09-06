@@ -1,24 +1,12 @@
-import React, { useContext } from "react"
-import {
-  ReactotronContext,
-  ContentView,
-  StateContext,
-  Header,
-  EmptyState,
-} from "reactotron-core-ui"
+import React, { useContext, useEffect } from "react"
+import { ReactotronContext, ContentView, StateContext, EmptyState } from "reactotron-core-ui"
 import { CommandType } from "reactotron-core-contract"
-import { MdDelete, MdAdd, MdDeleteSweep, MdNotificationsNone, MdImportExport } from "react-icons/md"
+import { MdDelete, MdAdd, MdDeleteSweep, MdNotificationsNone } from "react-icons/md"
 import styled from "styled-components"
 import { getApplicationKeyMap } from "react-hotkeys"
 
 // Move this out of this page. We are just hacking around this for now
 import { KeybindKeys, getPlatformSequence } from "../help/components/Keybind"
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-`
 
 const SubscriptionsContainer = styled.div`
   height: 100%;
@@ -58,7 +46,26 @@ function getLatestChanges(commands: any[]) {
 
 function Subscriptions() {
   const { commands, openSubscriptionModal } = useContext(ReactotronContext)
-  const { removeSubscription, clearSubscriptions } = useContext(StateContext)
+  const { removeSubscription, clearSubscriptions, setActions } = useContext(StateContext)
+
+  useEffect(() => {
+    setActions([
+      {
+        tip: "Add",
+        icon: MdAdd,
+        onClick: () => {
+          openSubscriptionModal()
+        },
+      },
+      {
+        tip: "Clear",
+        icon: MdDeleteSweep,
+        onClick: () => {
+          clearSubscriptions()
+        },
+      },
+    ])
+  }, [])
 
   // Get setup to show the right keybind!
   const subscriptionModalKeybind = getApplicationKeyMap().OpenSubscriptionModal
@@ -69,83 +76,44 @@ function Subscriptions() {
   const subscriptionValues = getLatestChanges(commands)
 
   return (
-    <Container>
-      <Header
-        isDraggable
-        tabs={[
-          {
-            text: "Subscriptions",
-            icon: MdNotificationsNone,
-            isActive: true,
-            // eslint-disable-next-line @typescript-eslint/no-empty-function
-            onClick: () => {},
-          },
-          {
-            text: "Snapshots",
-            icon: MdImportExport,
-            isActive: false,
-            onClick: () => {
-              // TODO: Couldn't get react-router-dom to do it for me so I forced it.
-              window.location.hash = "#/state/snapshots"
-            },
-          },
-        ]}
-        actions={[
-          {
-            tip: "Add",
-            icon: MdAdd,
-            onClick: () => {
-              openSubscriptionModal()
-            },
-          },
-          {
-            tip: "Clear",
-            icon: MdDeleteSweep,
-            onClick: () => {
-              clearSubscriptions()
-            },
-          },
-        ]}
-      />
-      <SubscriptionsContainer>
-        {subscriptionValues.length === 0 ? (
-          <EmptyState icon={MdNotificationsNone} title="No Subscriptions">
-            You can subscribe to state changes in your redux or mobx-state-tree store by pressing{" "}
-            {subscriptionModalSequence && (
-              <KeybindKeys
-                keybind={subscriptionModalKeybind}
-                sequence={subscriptionModalSequence}
-                addWidth={false}
-              />
-            )}
-          </EmptyState>
-        ) : (
-          subscriptionValues.map((subscription, index) => {
-            const value =
-              typeof subscription.value === "object"
-                ? { value: subscription.value }
-                : subscription.value
+    <SubscriptionsContainer>
+      {subscriptionValues.length === 0 ? (
+        <EmptyState icon={MdNotificationsNone} title="No Subscriptions">
+          You can subscribe to state changes in your redux or mobx-state-tree store by pressing{" "}
+          {subscriptionModalSequence && (
+            <KeybindKeys
+              keybind={subscriptionModalKeybind}
+              sequence={subscriptionModalSequence}
+              addWidth={false}
+            />
+          )}
+        </EmptyState>
+      ) : (
+        subscriptionValues.map((subscription, index) => {
+          const value =
+            typeof subscription.value === "object"
+              ? { value: subscription.value }
+              : subscription.value
 
-            return (
-              <SubscriptionContainer key={`subscription-${subscription.path}-${index}`}>
-                <SubscriptionPath>{subscription.path}</SubscriptionPath>
-                <SubscriptionValue>
-                  <ContentView value={value} />
-                </SubscriptionValue>
-                <SubscriptionRemove>
-                  <MdDelete
-                    size={24}
-                    onClick={() => {
-                      removeSubscription(subscription.path)
-                    }}
-                  />
-                </SubscriptionRemove>
-              </SubscriptionContainer>
-            )
-          })
-        )}
-      </SubscriptionsContainer>
-    </Container>
+          return (
+            <SubscriptionContainer key={`subscription-${subscription.path}-${index}`}>
+              <SubscriptionPath>{subscription.path}</SubscriptionPath>
+              <SubscriptionValue>
+                <ContentView value={value} />
+              </SubscriptionValue>
+              <SubscriptionRemove>
+                <MdDelete
+                  size={24}
+                  onClick={() => {
+                    removeSubscription(subscription.path)
+                  }}
+                />
+              </SubscriptionRemove>
+            </SubscriptionContainer>
+          )
+        })
+      )}
+    </SubscriptionsContainer>
   )
 }
 

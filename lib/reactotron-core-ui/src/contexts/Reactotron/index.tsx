@@ -7,6 +7,7 @@ import useReactotron from "./useReactotron"
 interface Props {
   commands: Command[]
   sendCommand: (type: string, payload: any, clientId?: string) => void
+  removeCommand: (messageId: number) => void
   clearCommands: () => void
   addCommandListener: (callback: (command: Command) => void) => void
 }
@@ -30,6 +31,7 @@ interface ContextProps extends Props {
 const ReactotronContext = React.createContext<ContextProps>({
   commands: [],
   sendCommand: null,
+  removeCommand: null,
   clearCommands: null,
   addCommandListener: null,
   isDispatchModalOpen: false,
@@ -44,6 +46,7 @@ const ReactotronContext = React.createContext<ContextProps>({
 const Provider: FunctionComponent<React.PropsWithChildren<Props>> = ({
   commands,
   sendCommand,
+  removeCommand,
   clearCommands,
   addCommandListener,
   children,
@@ -64,6 +67,7 @@ const Provider: FunctionComponent<React.PropsWithChildren<Props>> = ({
         commands,
         sendCommand,
         clearCommands,
+        removeCommand,
         addCommandListener,
         isDispatchModalOpen,
         dispatchModalInitialAction,

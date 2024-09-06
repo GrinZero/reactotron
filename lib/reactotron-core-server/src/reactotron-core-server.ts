@@ -241,7 +241,7 @@ export default class Server {
           const partConn = find(propEq("id", thisConnectionId), this.partialConnections) as any
 
           // add their address in
-          fullCommand.payload.address = partConn.address
+          ;(fullCommand.payload as Record<string, any>).address = partConn.address
 
           // remove them from the partial connections list
           this.partialConnections = reject(
@@ -306,7 +306,7 @@ export default class Server {
         // assign a name to the backups since the client doesn't pass one.  without it, we have to
         // call extendObservable instead of a standard assignment, which is very confusing.
         if (type === "state.backup.response") {
-          fullCommand.payload.name = null
+          ;(fullCommand.payload as Record<string, any>).name = null
         }
 
         this.emitter.emit("command", fullCommand)

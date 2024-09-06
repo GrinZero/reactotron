@@ -14,6 +14,7 @@ import KeybindHandler from "./KeybindHandler"
 interface Props {
   commands: Command[]
   sendCommand: (type: string, payload: any, clientId?: string) => void
+  removeCommand: (messageId: number) => void
   clearCommands: () => void
   addCommandListener: (callback: (command: Command) => void) => void
 }
@@ -22,6 +23,7 @@ interface Props {
 const ReactotronBrain: FunctionComponent<PropsWithChildren<Props>> = ({
   commands,
   sendCommand,
+  removeCommand,
   clearCommands,
   addCommandListener,
   children,
@@ -29,6 +31,7 @@ const ReactotronBrain: FunctionComponent<PropsWithChildren<Props>> = ({
   return (
     <ReactotronProvider
       commands={commands}
+      removeCommand={removeCommand}
       sendCommand={sendCommand}
       clearCommands={clearCommands}
       addCommandListener={addCommandListener}

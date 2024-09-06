@@ -47,7 +47,7 @@ export const CommandType = {
   Overlay: "overlay",
 } as const
 
-export type CommandTypeKey = (typeof CommandType)[keyof typeof CommandType]
+export type CommandTypeKey = (typeof CommandType)[keyof typeof CommandType] | string
 
 export interface CommandMap {
   [CommandType.ApiResponse]: any
@@ -79,6 +79,7 @@ export interface CommandMap {
   [CommandType.EditorOpen]: EditorOpenPayload
   [CommandType.Storybook]: boolean
   [CommandType.Overlay]: boolean
+  [key: string]: unknown
 }
 
 export interface Command<

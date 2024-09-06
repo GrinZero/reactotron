@@ -1,18 +1,19 @@
-import React, { useCallback, useContext, useMemo } from "react"
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { clipboard } from "electron"
 import fs from "fs"
 import debounce from "lodash.debounce"
 import {
   Header,
   filterCommands,
-  TimelineFilterModal,
   timelineCommandResolver,
   EmptyState,
   ReactotronContext,
   TimelineContext,
+  TimelineFilterModal,
 } from "reactotron-core-ui"
-import { MdSearch, MdDeleteSweep, MdFilterList, MdSwapVert, MdReorder } from "react-icons/md"
+import { MdSearch, MdDeleteSweep, MdSwapVert, MdReorder, MdFilterList } from "react-icons/md"
 import { FaTimes } from "react-icons/fa"
+import { GROUPS } from "./const"
 import styled from "styled-components"
 
 const Container = styled.div`
@@ -52,25 +53,91 @@ export const ButtonContainer = styled.div`
   padding: 10px;
   cursor: pointer;
 `
+const FilterContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  width: calc(100vw - 115px);
+  background-color: ${(props) => props.theme.background};
+  border-bottom: 1px solid ${(props) => props.theme.chromeLine};
+`
+const FilterButton = styled.button<{ active: boolean }>`
+  background-color: transparent;
+  border: none;
+  padding: 10px;
+  padding-bottom: 12px;
+  cursor: pointer;
+  color: ${(props) => {
+    return props.active ? props.theme.foreground : props.theme.foregroundDark
+  }};
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+  border-bottom: 2px solid;
+  border-color: ${(props) => {
+    return props.active ? props.theme.foreground : "transparent"
+  }};
+  font-size: 14px;
+  white-space: nowrap;
+`
 
 function Timeline() {
-  const { sendCommand, clearCommands, commands, openDispatchModal } = useContext(ReactotronContext)
+  const ctx = useContext(ReactotronContext)
+  const { commands, sendCommand, clearCommands, openDispatchModal } = ctx
   const {
     isSearchOpen,
     toggleSearch,
     closeSearch,
     setSearch,
+    openFilter,
     search,
     isReversed,
-    toggleReverse,
-    openFilter,
-    closeFilter,
     isFilterOpen,
+    closeFilter,
+    toggleReverse,
     hiddenCommands,
     setHiddenCommands,
   } = useContext(TimelineContext)
+  const [currentTab, setCurrentTab] = useState("all")
+  const { current: Plugins } = useRef<any>([])
+  const CurrentPlugin = useMemo(() => {
+    return Plugins.find((plugin: any) => plugin.meta.value === currentTab)
+  }, [Plugins, currentTab])
 
-  let filteredCommands = filterCommands(commands, search, hiddenCommands)
+  const [groups, setGroups] = useState(GROUPS)
+  const allValues = useMemo(() => {
+    return groups.reduce((acc, group) => {
+      return acc.concat(group.items.map((item) => item.value))
+    }, [] as string[])
+  }, [groups])
+  const [extraValues, setExtraValues] = useState([])
+
+  useEffect(() => {
+    const handler = (module) => {
+      const createPlugin = module.default
+      const plugin = createPlugin({})
+      Plugins.push(plugin)
+      setGroups((prev) => {
+        return [
+          ...prev,
+          {
+            name: "plugins",
+            items: [{ value: plugin.meta.value, text: plugin.meta.text }],
+          },
+        ]
+      })
+      setExtraValues((prev) => [...prev, plugin.meta.value])
+    }
+    import("../../plugins/timeline-mmkv-plugin").then(handler)
+    import("../../plugins/timeline-jotai-plugin").then(handler)
+  }, [])
+  console.log("commands", commands)
+
+  let filteredCommands = filterCommands(
+    commands,
+    search,
+    currentTab === "all" ? [] : (allValues.filter((item) => item !== currentTab) as any)
+  )
 
   if (isReversed) {
     filteredCommands = filteredCommands.reverse()
@@ -121,7 +188,12 @@ function Timeline() {
         {isSearchOpen && (
           <SearchContainer>
             <SearchLabel>Search</SearchLabel>
-            <SearchInput autoFocus value={searchString} onChange={handleInputChange} />
+            <SearchInput
+              className="cleaner"
+              autoFocus
+              value={searchString}
+              onChange={handleInputChange}
+            />
             <ButtonContainer
               onClick={() => {
                 if (search === "") {
@@ -136,39 +208,55 @@ function Timeline() {
           </SearchContainer>
         )}
       </Header>
-      <TimelineContainer>
-        {filteredCommands.length === 0 ? (
-          <EmptyState icon={MdReorder} title="No Activity">
-            Once your app connects and starts sending events, they will appear here.
-          </EmptyState>
-        ) : (
-          filteredCommands.map((command) => {
-            const CommandComponent = timelineCommandResolver(command.type)
-
-            if (CommandComponent) {
-              return (
-                <CommandComponent
-                  key={command.messageId}
-                  command={command}
-                  copyToClipboard={clipboard.writeText}
-                  readFile={(path) => {
-                    return new Promise((resolve, reject) => {
-                      fs.readFile(path, "utf-8", (err, data) => {
-                        if (err || !data) reject(new Error("Something failed"))
-                        else resolve(data)
-                      })
-                    })
-                  }}
-                  sendCommand={sendCommand}
-                  dispatchAction={dispatchAction}
-                  openDispatchDialog={openDispatchModal}
-                />
-              )
+      <FilterContainer>
+        {groups.map((group) => {
+          return group.items.map((item) => {
+            const onToggle = () => {
+              setCurrentTab(item.value)
             }
-
-            return null
+            return (
+              <FilterButton active={currentTab === item.value} key={item.value} onClick={onToggle}>
+                {item.text}
+              </FilterButton>
+            )
           })
-        )}
+        })}
+      </FilterContainer>
+      <TimelineContainer>
+        {!extraValues.includes(currentTab) &&
+          (filteredCommands.length === 0 ? (
+            <EmptyState icon={MdReorder} title="No Activity">
+              Once your app connects and starts sending events, they will appear here.
+            </EmptyState>
+          ) : (
+            filteredCommands.map((command) => {
+              const CommandComponent = timelineCommandResolver(command.type)
+
+              if (CommandComponent) {
+                return (
+                  <CommandComponent
+                    key={command.messageId}
+                    command={command}
+                    copyToClipboard={clipboard.writeText}
+                    readFile={(path) => {
+                      return new Promise((resolve, reject) => {
+                        fs.readFile(path, "utf-8", (err, data) => {
+                          if (err || !data) reject(new Error("Something failed"))
+                          else resolve(data)
+                        })
+                      })
+                    }}
+                    sendCommand={sendCommand}
+                    dispatchAction={dispatchAction}
+                    openDispatchDialog={openDispatchModal}
+                  />
+                )
+              }
+
+              return null
+            })
+          ))}
+        {extraValues.includes(currentTab) && <CurrentPlugin.render {...ctx} />}
       </TimelineContainer>
       <TimelineFilterModal
         isOpen={isFilterOpen}

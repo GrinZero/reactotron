@@ -34,7 +34,7 @@ const Title = styled.div`
   font-size: 12px;
 `
 
-function HeaderTabButton({ icon: Icon, text, isActive, onClick }: Props) {
+export function HeaderTabButton({ icon: Icon, text, isActive, onClick }: Props) {
   return (
     <Motion style={{ color: spring(isActive ? 1 : 0) }}>
       {({ color }) => (

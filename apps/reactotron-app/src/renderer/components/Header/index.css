@@ -1,0 +1,17 @@
+.header-link {
+  text-decoration: none;
+  margin-right: 20px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  color: inherit;
+  transition: all 0.3s;
+  -webkit-app-region: none;
+  opacity: 0.5;
+  width: 80px;
+}
+
+.header-link.active {
+  opacity: 1;
+}

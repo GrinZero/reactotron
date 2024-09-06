@@ -7,6 +7,7 @@ import {
   MdWarning,
   MdOutlineMobileFriendly,
   MdMobiledataOff,
+  MdNetworkCheck,
 } from "react-icons/md"
 import { FaMagic } from "react-icons/fa"
 import styled from "styled-components"
@@ -25,6 +26,7 @@ const SideBarContainer = styled.div.attrs(() => ({}))<SideBarContainerProps>`
   background-color: ${(props) => props.theme.backgroundSubtleDark};
   border-right: 1px solid ${(props) => props.theme.chromeLine};
   width: 115px;
+  flex-shrink: 0;
   transition: margin 0.2s ease-out;
   margin-left: ${(props) => (props.$isOpen ? 0 : -115)}px;
 `
@@ -58,12 +60,9 @@ function SideBar({ isOpen, serverStatus }: { isOpen: boolean; serverStatus: Serv
     <SideBarContainer $isOpen={isOpen}>
       <SideBarButton image={reactotronLogo} path="/" text="Home" hideTopBar />
       <SideBarButton icon={MdReorder} path="/timeline" text="Timeline" />
-      <SideBarButton
-        icon={MdAssignment}
-        path="/state/subscriptions"
-        matchPath="/state"
-        text="State"
-      />
+      {/* Network */}
+      <SideBarButton path="/network" icon={MdNetworkCheck} text="Network" />
+      <SideBarButton icon={MdAssignment} path="/state/store" matchPath="/state" text="State" />
       <SideBarButton
         icon={MdPhoneIphone}
         path="/native/overlay"

@@ -1,8 +1,13 @@
-import React, { FunctionComponent } from "react"
+import React, { FunctionComponent, useState } from "react"
 
 import useSubscriptions from "./useSubscriptions"
 import useSnapshots, { Snapshot } from "./useSnapshots"
 
+export interface Action {
+  tip: string
+  icon: any
+  onClick: () => void
+}
 interface Context {
   subscriptions: string[]
   addSubscription: (path: string) => void
@@ -17,6 +22,9 @@ interface Context {
   renameSnapshot: (name: string) => void
   openSnapshotRenameModal: (snapshot: Snapshot) => void
   closeSnapshotRenameModal: () => void
+
+  actions: Action[]
+  setActions: (actions: Action[]) => void
 }
 
 const StateContext = React.createContext<Context>({
@@ -33,11 +41,14 @@ const StateContext = React.createContext<Context>({
   renameSnapshot: null,
   openSnapshotRenameModal: null,
   closeSnapshotRenameModal: null,
+  actions: [],
+  setActions: null,
 })
 
 const Provider: FunctionComponent<any> = ({ children }) => {
   const { subscriptions, addSubscription, removeSubscription, clearSubscriptions } =
     useSubscriptions()
+  const [actions, setActions] = useState<Action[]>([])
 
   const {
     snapshots,
@@ -67,6 +78,8 @@ const Provider: FunctionComponent<any> = ({ children }) => {
         renameSnapshot,
         openSnapshotRenameModal,
         closeSnapshotRenameModal,
+        actions,
+        setActions,
       }}
     >
       {children}
